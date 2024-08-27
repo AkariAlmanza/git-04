@@ -1,52 +1,47 @@
-console.log('Saludos desde terminal')
+const cards = document.querySelector('#card-poke')
+const templateCard = document.querySelector('#template-card').content
+let prev, next
 
-// var, let, const
-var a = 10
-var a = '10'
-
-let b = 11
-let B = '11'
-// let b = '11' no puedo redefinir 
-
-const PI = 3.1416
-PI = 3.1417
-// PI = 3.1417
-console.log('@@@ concatenar => ', a + b)
-
-/*
-let nombre = prompt('Cual es tu nombre')
-console.log('@@ nombre =>', nombre)
-console.log('@@@ typeof => ', typeof  nombre)
-
-let edad = prompt('Cual es tu edad')
-console.log('@@ nombre =>', parseInt(edad))
-console.log('@@@ typeof => ', typeof  parseInt(edad))
-*/
-
-console.log('@@ document => ', document)
-console.log('@@ head => ', document.head)
-console.log('@@ body => ', document.body)
-console.log('@@ title => ', document.title)
-console.log('@@ domain => ', document.domain)
-
-document.title = 'Cambiado desde JS'
-
-/*
-getElementById('titulo')
-getElementByClassName('miClase')
-getElementByTabName('div')
-
-querySelector(selector) '#id', '.clase', 'div'
-querySelectorAll
-
-createElement('elemento')
-createDocumentFragment()
-*/
-
-document.addEventListener('DOMContentLoaded', ()
-=> {
-    console.log('@@ dom => carga todo')
-    console.log(document.querySelector('h1'))
+document.addEventListener('DOMContentLoades', () => {
+  fetchData()  
 })
 
+const fetchData = async (url) => {
+  try {
+    loadingData(true)
+    const link = url ? url : 'https://rickandmortyapi.com/api/character'
+    const res = await fetch(link)
+    const personajes = res.json()
+    next = personajes.info.next
+    prev = personajes.info.prev
+    pintarCards(personajes.results)
+    //console.log('@@ personajes => ', personajes)
+  } catch (error) {
+    console.error('@@ error => ', error)
+  } finally {
+    loadingData(false)
+  }
+}
 
+const pintarCards = (characters) => {
+    const fragment = document.createDocumentFragment()
+    cards.textContent = ''
+    characters.forEach((item) => {
+        const clone = templateCard.cloneNode(true)
+        clone.querySelector('h5').textContent = item.name 
+        clone.querySelector('p').textContent = item.species 
+        clone.querySelector('img').setAttribute('src', item.image)
+
+        fragment.appendChild(clone)
+    })
+    cards.appendChild(fragment)
+}
+
+const loadingData = (estado) => {
+  const loading = document.querySelector('#loading')
+  if (estado) {
+    loading.classList.remove('d-none')
+  } else {
+    loading.classList.add('d-none')
+  }
+}
